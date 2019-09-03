@@ -5,12 +5,13 @@ using System.Numerics;
 
 namespace Pamola.Phasor
 {
-    interface IPhasor
+    public interface IPhasor
     {
-        Complex Value { get; }
+        double Magnitude { get; set; }
+        double Phase { get; set; }
 
-        double RmsValue { get; }
-
-        double Period { set; get; }
+        Complex Value();
+            
+        Complex Value(double time);
     }
 }
