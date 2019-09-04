@@ -13,5 +13,7 @@ namespace Pamola.Phasor
         Complex Value();
             
         Complex Value(double time);
+
+        double InstantValue(double time);
     }
 }
