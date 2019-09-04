@@ -9,15 +9,25 @@ namespace Pamola.Phasor
     {
         public Phasor(double magnitude, double phase)
         {
-            Magnitude = magnitude;
-            Phase = phase;
+            var negative = Convert.ToDouble(magnitude < 0.0);
+
+            Magnitude = magnitude * (1 - 2 * negative);
+            Phase = phase + negative * TrigonometryExtensions.Degree2Radians(180);
         }
 
-        private double magnitude;
-        private double frequency;
+        public Phasor(double magnitude, double phase, double frequency)
+            : this(magnitude, phase)
+        {
+            Frequency = frequency;
+        }
 
-        public double Magnitude { get => magnitude; set { magnitude = CheckPhasorIntegrity(value, Magnitude); } }
-        public double Frequency { get => frequency; set { frequency = CheckPhasorIntegrity(value, Frequency); } }
+        public Phasor() : this(0.0, 0.0) { }
+
+
+        public double Magnitude { get; set; }
+
+        public double Frequency { get; set; }
+
         public double Phase { get; set; }
 
         private Complex ComputeAt(double time) => Magnitude * Complex.Exp(new Complex(0, (time * 2 * Math.PI * Frequency) + Phase));
@@ -32,16 +42,16 @@ namespace Pamola.Phasor
 
         public double RmsValue => Magnitude;
 
-        public double Period => 1/Frequency;
-
-        private double CheckPhasorIntegrity(double parameter, double property)
+        public double Period
         {
-            if (parameter < 0)
-                throw new ArgumentOutOfRangeException(nameof(parameter), parameter, "{nameof(property)} cannot be negative.");
+            get
+            {
+                if (Frequency == default(double))
+                    throw new DivideByZeroException($"Phasor frequency set to {default(double)}. Period tends to infinity.");
 
-            return parameter;
+                return 1 / Frequency;
+            }
         }
 
-        //TODO: Unit test Phasor Class.
     }
 }
