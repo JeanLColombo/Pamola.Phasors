@@ -9,10 +9,8 @@ namespace Pamola.Phasor
     {
         public Phasor(double magnitude, double phase)
         {
-            var negative = Convert.ToDouble(magnitude < 0.0);
-
-            Magnitude = magnitude * (1 - 2 * negative);
-            Phase = phase + negative * TrigonometryExtensions.Degree2Radians(180);
+            Phase = phase;
+            Magnitude = magnitude;
         }
 
         public Phasor(double magnitude, double phase, double frequency)
@@ -21,14 +19,27 @@ namespace Pamola.Phasor
             Frequency = frequency;
         }
 
+        private double _magnitude;
+        private double _phase;
+
+
         public Phasor() : this(0.0, 0.0) { }
 
+        public double Magnitude
+        {
+            get => _magnitude;
+            set
+            {
+                var negative = Convert.ToDouble(value < 0.0);
 
-        public double Magnitude { get; set; }
+                Phase += negative * TrigonometryExtensions.Degree2Radians(180);
+                _magnitude = value * (1 - 2 * negative);
+            }
+        }
 
         public double Frequency { get; set; }
 
-        public double Phase { get; set; }
+        public double Phase { get => _phase; set => _phase = value; }
 
         private Complex ComputeAt(double time) => Magnitude * Complex.Exp(new Complex(0, (time * 2 * Math.PI * Frequency) + Phase));
 
